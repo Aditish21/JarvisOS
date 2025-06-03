@@ -1,0 +1,59 @@
+/* h1{
+    color:red;
+}
+p{
+    color:fuchsia;
+}
+button{
+    color:blue
+}
+body{
+   background-color: rgb(30,20,10);;
+}
+button{
+    background-color: rgb(30,40,20);
+} */
+ /* *{
+    color:pink;
+ } */
+ #headingone{
+     color:yellow;
+ }
+ #headingtwo{
+    color:purple;
+ }
+ p{
+    text-align : right
+ }
+
+ h1{
+    text-align: center;
+    text-transform: capitalize;
+ }
+ *{
+    font-family: 'Times New Roman';
+ }
+ #outer{
+    font-size: 25px;
+ }
+  #inner{
+    font-size: 10px;
+ }
+ *{
+    color: white;
+ }
+ #navbar{
+    height: 60px;
+    background-color: #0f1111;
+
+ }
+ button{
+    background-color: #0f8804;
+ }
+ #logo{
+    color: #f08804;
+    font-size: 25px;
+ }
+ a{
+    margin-right: 200px;
+ }
