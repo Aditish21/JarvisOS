@@ -2,7 +2,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi import WebSocket, WebSocketDisconnect
 from core.stream_llm import stream_ai
 from fastapi import FastAPI
-from core.local_llm import askai
+from core.local_llm import ask_ai
 import asyncio
 app = FastAPI()
 app.add_middleware(
@@ -20,7 +20,7 @@ def home():
 @app.get("/chat")
 def chat(q: str):
 
-    response = askai(q)
+    response = ask_ai(q)
 
     return {
         "user": q,
