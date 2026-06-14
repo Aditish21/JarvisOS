@@ -1,4 +1,9 @@
+from fastapi import UploadFile, File
+from rag.pdf_loader import load_pdf
+from rag.chunker import chunk_text
+from rag.document_store import save_chunks
 from fastapi.middleware.cors import CORSMiddleware
+
 from fastapi import WebSocket, WebSocketDisconnect
 from core.stream_llm import stream_ai
 from fastapi import FastAPI
@@ -25,6 +30,29 @@ def chat(q: str):
     return {
         "user": q,
         "ai": response
+    }
+@app.post("/upload-pdf")
+async def upload_pdf(
+    file: UploadFile = File(...)
+):
+
+    file_path = f"uploads/{file.filename}"
+
+    with open(file_path, "wb") as buffer:
+        buffer.write(
+            await file.read()
+        )
+
+    text = load_pdf(file_path)
+
+    chunks = chunk_text(text)
+
+    save_chunks(chunks)
+
+    return {
+        "status": "success",
+        "filename": file.filename,
+        "chunks": len(chunks)
     }
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):

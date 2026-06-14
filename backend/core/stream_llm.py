@@ -1,9 +1,8 @@
 import ollama
 import asyncio
-
+from automation.command_router import run_pc_command
 from memory.memory_manager import get_memory_context
 from memory.memory_saver import auto_save_memory
-
 from agents.router import route_query
 from rag.retriever import retrieve_document
 
@@ -14,31 +13,34 @@ async def stream_ai(prompt, stop_flag: dict):
     # ROUTER
     # -----------------------------
     route = route_query(prompt)
-
     print(f"\n[ROUTE] {route}")
+
+    # -----------------------------
+    # AUTOMATION ROUTE
+    # -----------------------------
+    if route == "automation":
+        result = run_pc_command(prompt)
+
+        if result:          # ← indented correctly
+            yield result
+            return          # ← indented correctly, only returns for automation
 
     # -----------------------------
     # PDF ROUTE
     # -----------------------------
     if route == "pdf":
-
         context = retrieve_document(prompt)
-
         messages = [
             {
                 "role": "system",
-                "content": f"""
-You are JarvisOS.
+                "content": f"""You are JarvisOS.
 
 Answer using ONLY the PDF context below.
 
 PDF CONTEXT:
-
 {context}
 
-If the answer is not present in the PDF,
-say:
-
+If the answer is not present in the PDF, say:
 "I could not find that information in the document."
 """
             },
@@ -52,7 +54,6 @@ say:
     # MEMORY + GENERAL AI ROUTE
     # -----------------------------
     else:
-
         memory = get_memory_context(prompt)
 
         has_memory = (
@@ -62,22 +63,18 @@ say:
 
         memory_section = f"""
 MEMORY ABOUT USER:
-
 {memory}
-
 Use memory only if relevant.
 """ if has_memory else "No user memory available."
 
         messages = [
             {
                 "role": "system",
-                "content": f"""
-You are JarvisOS.
+                "content": f"""You are JarvisOS.
 
 {memory_section}
 
-Answer honestly.
-Do not invent information.
+Answer honestly. Do not invent information.
 """
             },
             {
@@ -110,19 +107,13 @@ Do not invent information.
             return None
 
     while True:
-
         if stop_flag.get("stop"):
             break
 
-        chunk = await loop.run_in_executor(
-            None,
-            get_next_chunk,
-            stream
-        )
+        chunk = await loop.run_in_executor(None, get_next_chunk, stream)
 
         if chunk is None:
             break
 
         content = chunk["message"]["content"]
-
         yield content
